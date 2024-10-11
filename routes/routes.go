@@ -131,8 +131,15 @@ func GetRequests(c *gin.Context) {
     c.Header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
     c.Header("Pragma", "no-cache")
 
+    userID := c.Query("user_id")
+
     // Получение всех заявок из базы данных
-    if err := config.DB.Find(&requests).Error; err != nil {
+    query := config.DB
+    if userID != "" {
+        query = query.Where("user_id = ?", userID)
+    }
+
+    if err := query.Find(&requests).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get requests"})
         return
     }
