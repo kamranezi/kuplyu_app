@@ -132,11 +132,15 @@ func GetRequests(c *gin.Context) {
     c.Header("Pragma", "no-cache")
 
     userID := c.Query("user_id")
+    requestID := c.Query("request_id")
 
     // Получение всех заявок из базы данных
     query := config.DB
     if userID != "" {
         query = query.Where("user_id = ?", userID)
+    }
+    if requestID != "" {
+        query = query.Where("id = ?", requestID)
     }
 
     if err := query.Find(&requests).Error; err != nil {
@@ -146,6 +150,7 @@ func GetRequests(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"requests": requests})
 }
+
 
 // Создание новой заявки с использованием user_id из JWT
 func CreateRequest(c *gin.Context) {
